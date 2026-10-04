@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Central de Segurança</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#020402;color:#00ff66;font-family:Consolas,monospace;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;opacity:.25}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;padding:20px}
+.box{width:min(780px,94%);border:1px solid #00ff66;background:rgba(0,8,0,.93);padding:30px;box-shadow:0 0 35px rgba(0,255,102,.18)}
+h1{font-size:24px;margin:0 0 22px}
+#status{min-height:70px;font-size:18px;line-height:1.6}
+.bar{height:19px;border:1px solid #00ff66;margin:18px 0 8px}
+.fill{height:100%;width:0;background:#00ff66;box-shadow:0 0 12px #00ff66}
+#percent{text-align:right}
+.final{text-align:center}.emoji{font-size:70px}.final h2{font-size:28px}.final p{font-size:17px}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="overlay"><div class="box" id="box">
+<h1>⚠ CENTRAL DE SEGURANÇA ⚠</h1>
+<div id="status">Identificando usuário...</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div id="percent">0%</div>
+</div></div>
+<script>
+const canvas=document.getElementById("matrix"),ctx=canvas.getContext("2d");
+let font=14,cols,drops;
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;cols=Math.floor(canvas.width/font);drops=Array(cols).fill(1).map(()=>Math.random()*-30)}
+resize();addEventListener("resize",resize);
+const chars="01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+<>/{}[]";
+setInterval(()=>{
+ctx.fillStyle="rgba(0,4,0,.09)";ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#00ff66";ctx.font=font+"px Consolas";
+for(let i=0;i<drops.length;i++){ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*font,drops[i]*font);if(drops[i]*font>canvas.height&&Math.random()>.975)drops[i]=0;drops[i]+=.72}
+},45);
+
+const status=document.getElementById("status"),fill=document.getElementById("fill"),percent=document.getElementById("percent");
+const msgs=[
+"USUÁRIO IDENTIFICADO: ANTÔNIO MILTON",
+"Verificando informações escolares...",
+"Turma: 8º ano B",
+"Verificando criptografia...",
+"Analisando sistema...",
+"Finalizando análise..."
+];
+let start=performance.now(),duration=9000;
+function tick(now){
+let p=Math.min(100,(now-start)/duration*100);
+fill.style.width=p+"%";percent.textContent=Math.floor(p)+"%";
+status.textContent=msgs[Math.min(msgs.length-1,Math.floor(p/18))];
+if(p<100)requestAnimationFrame(tick);
+else setTimeout(()=>{
+document.getElementById("box").innerHTML=
+'<div class="final"><div class="emoji">😂</div><h2>CALMA, ANTÔNIO!</h2><p>VOCÊ CAIU NA PEGADINHA DO HENRIQUE! 🤣</p><p>Nenhum dado foi coletado ou acessado.</p></div>';
+},500);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
